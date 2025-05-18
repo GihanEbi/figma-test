@@ -1,13 +1,8 @@
 "use client";
 
-import {
-  HomeIcon,
-  UserGroupIcon,
-  PencilIcon,
-  ChevronDownIcon,
-  StarIcon, // Placeholder for medal
-} from "@heroicons/react/24/solid"; // Solid icons
-import Image from "next/image"; // If you have the profile image locally
+import { useState } from "react";
+import { ChevronDownIcon } from "@heroicons/react/24/solid";
+import Image from "next/image";
 
 import MyHomeIcon from "@/components/icons/HomeIcon";
 import ChartBarIconSolid from "@/components/icons/ChartBarIconSolid";
@@ -20,8 +15,165 @@ import ShoppingCartIcon from "@/components/icons/ShoppingCartIcon";
 import InformationCircleIcon from "@/components/icons/InformationCircleIcon";
 import CheckIcon from "@/components/icons/CheckIcon";
 
-// Placeholder for profile image
-const DUMMY_PROFILE_IMAGE_URL = "https://via.placeholder.com/40"; // Replace with your actual image path or URL
+const DUMMY_PROFILE_IMAGE_URL = "https://via.placeholder.com/40";
+
+// --- TYPE DEFINITIONS --- (assuming these are already defined from previous step)
+interface MonthStatDetail {
+  title: string;
+  amount: number;
+  description: string;
+  iconSymbol?: string;
+}
+
+interface BarDataPoint {
+  month: string;
+  value: number;
+  stats?: MonthStatDetail[];
+}
+
+interface YearData {
+  totalEarned: number;
+  data: BarDataPoint[];
+}
+
+const yearlyMockData: {
+  "2022": YearData;
+} = {
+  "2022": {
+    totalEarned: 905,
+    data: [
+      {
+        month: "Mar",
+        value: 80,
+        stats: [
+          {
+            title: "Spring Promo",
+            amount: 200,
+            description: "Campaign A",
+            iconSymbol: "🌸",
+          },
+        ],
+      },
+      {
+        month: "Apr",
+        value: 50,
+        stats: [
+          {
+            title: "Workshop Fees",
+            amount: 450,
+            description: "Spirituality",
+            iconSymbol: "🛠️",
+          },
+        ],
+      }, // No specific stats for April
+      {
+        month: "May",
+        value: 90,
+        stats: [
+          {
+            title: "Workshop Fees",
+            amount: 350,
+            description: "Advanced",
+            iconSymbol: "🛠️",
+          },
+        ],
+      },
+      {
+        month: "Jun",
+        value: 70,
+        stats: [
+          {
+            title: "Group meditation",
+            amount: 305,
+            description: "Spirituality",
+            iconSymbol: "☯️",
+          },
+          {
+            title: "90's Hip-Hop",
+            amount: 100,
+            description: "HouseF",
+            iconSymbol: "🏠",
+          },
+        ],
+      },
+      {
+        month: "Jul",
+        value: 30,
+        stats: [
+          {
+            title: "Workshop Fees",
+            amount: 350,
+            description: "Advanced",
+            iconSymbol: "🛠️",
+          },
+        ],
+      },
+      {
+        month: "Aug",
+        value: 100,
+        stats: [
+          {
+            title: "Summer Special",
+            amount: 400,
+            description: "Limited Time",
+            iconSymbol: "☀️",
+          },
+        ],
+      },
+      {
+        month: "Sep",
+        value: 55,
+        stats: [
+          {
+            title: "Group meditation",
+            amount: 305,
+            description: "Spirituality",
+            iconSymbol: "☯️",
+          },
+          {
+            title: "90's Hip-Hop",
+            amount: 100,
+            description: "HouseF",
+            iconSymbol: "🏠",
+          },
+        ],
+      },
+      {
+        month: "Oct",
+        value: 85,
+        stats: [
+          {
+            title: "Workshop Fees",
+            amount: 350,
+            description: "Advanced",
+            iconSymbol: "🛠️",
+          },
+        ],
+      },
+      {
+        month: "Nov",
+        value: 65,
+        stats: [
+          {
+            title: "Group meditation",
+            amount: 305,
+            description: "Spirituality",
+            iconSymbol: "☯️",
+          },
+          {
+            title: "90's Hip-Hop",
+            amount: 100,
+            description: "HouseF",
+            iconSymbol: "🏠",
+          },
+        ],
+      },
+    ],
+  },
+};
+
+type YearKey = keyof typeof yearlyMockData;
+// --- COMPONENTS ---
 
 const Sidebar = () => {
   const navItems = [
@@ -29,7 +181,7 @@ const Sidebar = () => {
     { icon: TrophyIconSolid, active: false, label: "Awards" },
     { icon: DocumentTextIcon, active: false, label: "Documents" },
     { icon: ChatBubbleLeftEllipsisIcon, active: false, label: "Chat" },
-    { icon: ChartBarIconSolid, active: true, label: "Statistics" }, // Active item
+    { icon: ChartBarIconSolid, active: true, label: "Statistics" },
     { icon: Cog6ToothIcon, active: false, label: "Settings" },
     { icon: FunnelIcon, active: false, label: "Filter" },
     { icon: ShoppingCartIcon, active: false, label: "Cart" },
@@ -58,57 +210,43 @@ const Header = () => {
   return (
     <header className="flex justify-between items-center py-4">
       <div className="flex items-center space-x-2">
-        {/* <UserGroupIcon className="w-8 h-8 text-yellow-500" />
-        <UserGroupIcon className="w-8 h-8 text-yellow-400 -ml-4 opacity-70" />
-        <UserGroupIcon className="w-8 h-8 text-yellow-300 -ml-4 opacity-50" /> */}
         <img
-          src="/logo.png" // Assuming you have profile-pic.jpg in your public folder
+          src="/logo.png"
           alt="Logo"
           className="w-10 h-10 rounded-full object-cover"
-          onError={(e) => (e.currentTarget.src = DUMMY_PROFILE_IMAGE_URL)} // Fallback
+          onError={(e) => (e.currentTarget.src = DUMMY_PROFILE_IMAGE_URL)}
         />
         <h1 className="text-2xl font-bold text-blue-600 ml-1">Kumele</h1>
       </div>
       <div>
-        {/* Replace with Next/Image if you have the image locally or use a real URL */}
         <img
-          src="/profile-pic.png" // Assuming you have profile-pic.jpg in your public folder
+          src="/profile-pic.png"
           alt="User Profile"
           className="w-10 h-10 rounded-full object-cover"
-          onError={(e) => (e.currentTarget.src = DUMMY_PROFILE_IMAGE_URL)} // Fallback
+          onError={(e) => (e.currentTarget.src = DUMMY_PROFILE_IMAGE_URL)}
         />
       </div>
     </header>
   );
 };
+
 const PieChart = () => {
-  // Colors visually matched to the provided cropped pie chart image
-  const goldColorPie = "#eab308"; // Visually like Tailwind yellow-500
-  const bronzeColorPie = "#d97706"; // Visually like Tailwind amber-600
-  const silverColorPie = "#9ca3af"; // Visually like Tailwind gray-400
-
-  // The conic-gradient defines segments:
-  // color_A start_A_angle, color_A end_A_angle,
-  // color_B start_B_angle, color_B end_B_angle, ...
-  // This creates sharp transitions between solid color segments.
-
-  // Angles based on visual inspection (three equal 120-degree segments):
-  // Gold: Starts at 330deg (-30deg), goes through 0deg, ends at 90deg.
-  // Bronze: Starts at 90deg, ends at 210deg.
-  // Silver: Starts at 210deg, ends at 330deg.
+  const goldColorPie = "#eab308";
+  const bronzeColorPie = "#d97706";
+  const silverColorPie = "#9ca3af";
 
   const gradientStyle = {
     backgroundImage: `conic-gradient(
-      ${goldColorPie} 0deg 90deg,         /* Gold segment part 1 (East to South) */
-      ${bronzeColorPie} 90deg 210deg,    /* Bronze segment (South to WSW) */
-      ${silverColorPie} 210deg 330deg,   /* Silver segment (WSW to NNW) */
-      ${goldColorPie} 330deg 360deg      /* Gold segment part 2 (NNW to East) */
+      ${goldColorPie} 0deg 90deg,
+      ${bronzeColorPie} 90deg 210deg,
+      ${silverColorPie} 210deg 330deg,
+      ${goldColorPie} 330deg 360deg
     )`,
   };
 
   return (
     <div
-      className="w-48 h-48 sm:w-56 sm:h-56 rounded-full" // Original size classes
+      className="w-48 h-48 sm:w-56 sm:h-56 rounded-full"
       style={gradientStyle}
       role="img"
       aria-label="Reward medals pie chart showing Gold, Bronze, and Silver segments"
@@ -128,14 +266,12 @@ const RewardRingsSection = () => {
       <div className="flex items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-800">Reward Rings</h2>
         <Image
-          src="/reward-star.gif" // Path relative to the public folder
+          src="/reward-star.gif"
           alt="Animated reward star"
-          width={20} // Corresponds to w-5 (1.25rem * 16px/rem = 20px)
-          height={20} // Corresponds to h-5
-          className="ml-2" // Tailwind class for margin.
-          // w-5 h-5 can also be added here if you prefer,
-          // but width/height props are primary for next/image.
-          unoptimized={true} // For GIFs, optimization is often not needed and can sometimes break animation.
+          width={20}
+          height={20}
+          className="ml-2"
+          unoptimized={true}
         />
       </div>
       <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-6 sm:space-y-0 sm:space-x-6">
@@ -164,139 +300,152 @@ const RewardRingsSection = () => {
     </div>
   );
 };
+// --- COMPONENTS ---
+// ... (Sidebar, Header, PieChart, RewardRingsSection remain the same)
 
-// Simplified Bar Chart
-// const BarChart = () => {
-//   const data = [
-//     { month: 'Mar', value: 80, color: 'bg-blue-500' },
-//     { month: 'Apr', value: 50, color: 'bg-blue-500' },
-//     { month: 'May', value: 90, color: 'bg-blue-500' },
-//     { month: 'Jun', value: 70, color: 'bg-yellow-400',
-//       tooltip: { title: 'Group meditation', amount: '$305', type: 'Spirituality', icon: '🧘' } // Example icon
-//     },
-//     { month: 'Jul', value: 30, color: 'bg-blue-500' },
-//     { month: 'Aug', value: 100, color: 'bg-blue-500',
-//       tooltip: { title: "90's Hip-Hop", amount: '$100', type: 'House F', icon: '🎧'} // Example icon
-//     },
-//     { month: 'Sep', value: 55, color: 'bg-blue-500' },
-//     { month: 'Oct', value: 85, color: 'bg-blue-500' },
-//     { month: 'Nov', value: 65, color: 'bg-blue-500' },
-//   ];
-//   const maxValue = 100; // For scaling bar height
+interface BarChartProps {
+  data: BarDataPoint[];
+  selectedMonth: string | null; // New prop
+}
 
-//   return (
-//     <div className="mt-8">
-//       <div className="flex items-end justify-between h-48 space-x-2 px-2">
-//         {data.map((bar, index) => (
-//           <div key={bar.month} className="flex-1 flex flex-col items-center relative">
-//             {bar.tooltip && (
-//               <div
-//                 className="absolute bg-gray-100 p-2 rounded-md shadow-lg text-xs text-gray-700 whitespace-nowrap z-10"
-//                 // Adjust positioning based on which bar it is. This is a bit manual.
-//                 style={{
-//                   bottom: `${(bar.value / maxValue) * 100 + 15}%`, // Position above bar
-//                   left: '50%',
-//                   transform: 'translateX(-50%)',
-//                 }}
-//               >
-//                 <p className="font-semibold">{bar.tooltip.title}</p>
-//                 <p className="text-gray-500">{bar.tooltip.amount} <span className="text-gray-400">{bar.tooltip.icon} {bar.tooltip.type}</span></p>
-//                 {/* Dotted line - very basic */}
-//                 {index === 3 && ( /* Show dotted line for June */
-//                     <div className="absolute left-1/2 -bottom-2.5 transform -translate-x-1/2 w-px h-2.5 border-l border-dashed border-gray-400"></div>
-//                 )}
-//               </div>
-//             )}
-//             <div
-//               className={`${bar.color} w-full rounded-t-md hover:opacity-90 transition-opacity`}
-//               style={{ height: `${(bar.value / maxValue) * 100}%` }}
-//               title={`${bar.month}: ${bar.value}`}
-//             ></div>
-//           </div>
-//         ))}
-//       </div>
-//       <div className="flex justify-between text-xs text-gray-500 mt-2 px-2">
-//         {data.map((bar) => (
-//           <span key={bar.month} className="flex-1 text-center">{bar.month}</span>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-// Updated BarChart component
-const BarChart = () => {
-  const data = [
-    { month: "Mar", value: 80 },
-    { month: "Apr", value: 50 },
-    { month: "May", value: 90 },
-    { month: "Jun", value: 70 },
-    { month: "Jul", value: 30 },
-    { month: "Aug", value: 100 },
-    { month: "Sep", value: 55 },
-    { month: "Oct", value: 85 },
-    { month: "Nov", value: 65 },
-  ];
-  const maxValue = 100; // Max possible value for scaling bar height
-  // Define the chart's drawable area height in pixels.
-  // Tailwind's h-40 is 10rem. If 1rem = 16px, then 10rem = 160px.
-  const chartAreaHeightPx = 160;
+const BarChart: React.FC<BarChartProps> = ({ data, selectedMonth }) => {
+  const maxValue = Math.max(100, ...data.map((d) => d.value)); // Dynamically set maxValue or keep it 100 if preferred
+  const chartAreaHeightPx = 160; // Base height for the bars
+  const statsDisplayHeightBuffer = 60; // Extra space reserved for stats display above bars
+
+  if (!data || data.length === 0) {
+    return (
+      <div
+        className={`h-[${
+          chartAreaHeightPx + statsDisplayHeightBuffer + 28
+        }px] flex items-center justify-center text-gray-500`}
+      >
+        No data available for selected period.
+      </div>
+    );
+  }
 
   return (
     <div className="mt-6">
-      {" "}
-      {/* Adjusted top margin slightly */}
-      {/* Bar container:
-          - flex: establishes a flex context.
-          - items-end: aligns children (bar wrappers) to the bottom of this container.
-          - justify-around: distributes space around the bar wrappers.
-          - h-[${chartAreaHeightPx}px]: Explicit height for the charting area. Tailwind JIT creates this class.
-          - space-x-1 sm:space-x-2: Adds horizontal spacing between bar wrappers.
-          - px-1: Small horizontal padding for the overall chart area.
-      */}
+      {/* Container for bars and potential stats, includes buffer for stats */}
       <div
-        className={`flex items-end justify-around h-[${chartAreaHeightPx}px] space-x-1 sm:space-x-2 px-1`}
+        className={`flex items-end justify-around h-[${
+          chartAreaHeightPx + statsDisplayHeightBuffer
+        }px] space-x-1 sm:space-x-2 px-1 relative`}
       >
-        {data.map((barData) => (
-          // Bar wrapper:
-          // - flex-1: Allows the wrapper to grow and share space along the main axis.
-          // - flex flex-col: Makes this a vertical flex container for the bar itself.
-          // - justify-end: Pushes the bar (its child) to the bottom of this wrapper.
-          // - items-center: Centers the bar horizontally within this wrapper.
-          // - h-full: Makes this wrapper take the full height of the parent chart area.
-          <div
-            key={barData.month}
-            className="flex-1 flex flex-col justify-end items-center h-full"
-          >
-            {/* Actual Bar element:
-                - bg-blue-500: Sets the blue background color.
-                - w-full: Bar takes full width of its immediate parent (the centered column).
-                - max-w-[28px] sm:max-w-[36px]: Constrains bar width for a typical bar chart look. Adjust as needed.
-                - rounded-t-md: Rounds the top corners of the bar.
-                - hover:bg-blue-600 transition-colors: Adds a slight hover effect.
-                - style: Sets the height dynamically based on its value.
-            */}
+        {data.map((barData, index) => {
+          const isMonthSelected = barData.month === selectedMonth;
+          const barHeight = Math.max(
+            0,
+            (barData.value / maxValue) * chartAreaHeightPx
+          );
+          const hasStats =
+            isMonthSelected && barData.stats && barData.stats.length > 0;
+
+          // Calculate how many stat cards to show for centering. Max 2 for this layout.
+          const numStatCards = hasStats
+            ? Math.min(barData.stats!.length, 2)
+            : 0;
+          // Adjust horizontal positioning based on number of cards for better centering over the bar
+          const statCardsHorizontalOffset =
+            numStatCards === 1
+              ? "-50%" // Center single card
+              : numStatCards === 2
+              ? `calc(-50% - ${(100 + 4) / 2}px + 50%)` // Center two cards (approx 100px width + 4px space)
+              : "-50%";
+
+          return (
             <div
-              className="bg-blue-500 w-full max-w-[28px] sm:max-w-[36px] rounded-t-md hover:bg-blue-600 transition-colors"
-              style={{
-                height: `${Math.max(
-                  0,
-                  (barData.value / maxValue) * chartAreaHeightPx
-                )}px`,
-              }}
-              title={`${barData.month}: Value ${barData.value}`} // Basic accessibility
-            ></div>
-          </div>
-        ))}
+              key={`${barData.month}-${index}`} // Using index for key safety if months can repeat (though unlikely here)
+              className="flex-1 flex flex-col justify-end items-center h-full relative"
+            >
+              {/* Stat display section */}
+              {hasStats && (
+                <div
+                  className="absolute flex flex-col items-center z-10"
+                  style={{
+                    // Position the entire stats group (cards + line)
+                    // 'barHeight' is top of bar, '10px' for dotted line, '5px' gap to cards
+                    bottom: `${barHeight + 10 + 5}px`,
+                    left: "50%",
+                    // Transform to center the group above the bar
+                    // This might need fine-tuning based on actual stat card widths
+                    transform: `translateX(${statCardsHorizontalOffset})`,
+                    minWidth: "100px", // Ensure it has some base width
+                  }}
+                >
+                  {/* Stat cards container (horizontal layout for multiple cards) */}
+                  <div className="flex space-x-1 items-end mb-1">
+                    {barData.stats!.slice(0, 2).map(
+                      (
+                        stat,
+                        statIndex // Show max 2 stat cards as per image
+                      ) => (
+                        <div
+                          key={statIndex}
+                          className="bg-gray-100 p-1.5 rounded text-xs shadow-md w-max min-w-[100px] max-w-[150px] border border-gray-200"
+                        >
+                          <p className="font-bold text-gray-800 whitespace-nowrap truncate">
+                            {stat.title}
+                          </p>
+                          <div className="flex items-center text-gray-600 text-[11px] mt-0.5">
+                            <span className="font-medium text-gray-800">
+                              ${stat.amount}
+                            </span>
+                            {stat.iconSymbol && (
+                              <span className="mx-1 text-[10px] leading-none text-gray-500 align-middle">
+                                {stat.iconSymbol}
+                              </span>
+                            )}
+                            <span className="text-gray-500 truncate">
+                              {stat.description}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </div>
+
+                  {/* Dotted line connecting stats to the bar */}
+                  <div
+                    className="w-px" // Vertical line
+                    style={{
+                      height: "10px", // Height of the dotted line
+                      // Dotted line effect
+                      backgroundImage:
+                        "linear-gradient(to bottom, #cbd5e1 60%, transparent 40%)", // Tailwind's gray-300
+                      backgroundSize: "1px 3px", // 1px wide, 3px pattern (dash + gap)
+                      backgroundRepeat: "repeat-y",
+                    }}
+                  ></div>
+                </div>
+              )}
+
+              {/* The bar itself */}
+              <div
+                className={`w-full max-w-[28px] sm:max-w-[36px] rounded-t-md transition-all duration-300 ease-out
+                  ${
+                    isMonthSelected
+                      ? "bg-yellow-400"
+                      : "bg-blue-500 hover:bg-blue-600"
+                  }`}
+                style={{
+                  height: `${barHeight}px`,
+                }}
+                title={`${barData.month}: Value ${barData.value}`} // Tooltip for accessibility
+              ></div>
+            </div>
+          );
+        })}
       </div>
-      {/* Month Labels container:
-          - flex, justify-around: Similar to the bar container for alignment of labels.
-          - text-xs text-gray-500: Styles for the labels.
-          - mt-2: Margin above the labels.
-          - px-1: Matches padding of bar container.
-      */}
+
+      {/* Month labels below the chart */}
       <div className="flex justify-around text-xs text-gray-900 mt-2 px-1">
-        {data.map((barData) => (
-          <span key={barData.month} className="flex-1 text-center">
+        {data.map((barData, index) => (
+          <span
+            key={`${barData.month}-label-${index}`}
+            className="flex-1 text-center"
+          >
             {barData.month}
           </span>
         ))}
@@ -305,61 +454,176 @@ const BarChart = () => {
   );
 };
 
-// const MoneyEarnedSection = () => {
-//   return (
-//     <div className="w-full lg:w-3/5 mt-10 lg:mt-0">
-//       <div className="flex justify-between items-center mb-6">
-//         <h2 className="text-xl font-semibold text-gray-800">Money Earned <span className="text-blue-600">$905</span></h2>
-//         <button className="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md text-sm">
-//           2022
-//           <PencilIcon className="w-3 h-3 ml-2 text-gray-500" />
-//           {/* Or use ChevronDownIcon for a dropdown look */}
-//           {/* <ChevronDownIcon className="w-4 h-4 ml-1 text-gray-500" /> */}
-//         </button>
-//       </div>
-//       <BarChart />
-//     </div>
-//   );
-// };
-// Ensure CheckIcon is imported: import { CheckIcon, ... } from '@heroicons/react/24/solid';
+import { useEffect, useRef } from "react"; // Add useEffect, useRef
+// import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/solid"; // Ensure ChevronDownIcon is imported
+
+// ... (other imports)
 
 const MoneyEarnedSection = () => {
+  const [selectedYear, setSelectedYear] = useState<YearKey>("2022");
+  // Initial month is "Jun" for 2022 to match the image, otherwise null (overview)
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(
+    selectedYear === "2022" ? "Jun" : null
+  );
+  const [isMonthListOpen, setIsMonthListOpen] = useState(false);
+  const monthDropdownRef = useRef<HTMLDivElement>(null);
+
+  const currentYearData: YearData = yearlyMockData[selectedYear] || {
+    totalEarned: 0,
+    data: [],
+  };
+  const availableMonths = currentYearData.data.map((d) => d.month);
+
+  const handleYearChange = (newYear: YearKey) => {
+    setSelectedYear(newYear);
+    const newYearMonthsData = yearlyMockData[newYear]?.data;
+    // Set a default selected month for the new year, or clear it
+    if (
+      newYear === "2022" &&
+      newYearMonthsData?.find((m) => m.month === "Jun")
+    ) {
+      setSelectedMonth("Jun"); // Default to Jun for 2022 as per image
+    } else {
+      setSelectedMonth(null); // Default to overview/no specific month for other years or if Jun not present
+    }
+    setIsMonthListOpen(false); // Close month list when year changes
+  };
+
+  const toggleMonthList = () => setIsMonthListOpen((prev) => !prev);
+
+  const selectMonth = (month: string | null) => {
+    setSelectedMonth(month);
+    setIsMonthListOpen(false);
+  };
+
+  // Effect for closing dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        monthDropdownRef.current &&
+        !monthDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsMonthListOpen(false);
+      }
+    };
+
+    if (isMonthListOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMonthListOpen]);
+
   return (
     <div className="w-full lg:w-3/5 mt-10 lg:mt-0">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-start mb-4">
         {" "}
-        {/* Adjusted margin */}
-        <h2 className="text-xl font-medium text-gray-800">
-          Money Earned <span className="text-gray-900">$905</span>
-        </h2>
-        <button className="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md text-sm">
-          2022
-          <CheckIcon className="w-4 h-4 ml-2 text-gray-700" />{" "}
-          {/* Icon changed to CheckIcon */}
-        </button>
+        {/* items-start for alignment */}
+        <div>
+          <h2 className="text-xl font-medium text-gray-800">
+            Money Earned{" "}
+            <span className="text-gray-900">
+              ${currentYearData.totalEarned}
+            </span>
+          </h2>
+          {/* Simplified Year Selector Buttons */}
+          {/* <div className="flex space-x-1 mt-2">
+            {(Object.keys(yearlyMockData) as YearKey[]).map((year) => (
+              <button
+                key={year}
+                onClick={() => handleYearChange(year)}
+                className={`px-2.5 py-1 rounded-md text-xs transition-colors ${
+                  selectedYear === year
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                {year}
+              </button>
+            ))}
+          </div> */}
+        </div>
+        {/* Custom Month Dropdown Area */}
+        <div className="relative mt-4 sm:mt-0" ref={monthDropdownRef}>
+          <button
+            onClick={toggleMonthList}
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-between min-w-[100px]"
+            aria-haspopup="listbox"
+            aria-expanded={isMonthListOpen}
+            aria-controls="month-list-dropdown"
+          >
+            <span>{selectedYear}</span>
+            {/* Using CheckIcon as per image */}
+            <CheckIcon className="w-4 h-4 ml-3 text-gray-600" />
+            {/* Alternative: Chevron for more standard dropdown feel
+            <ChevronDownIcon
+              className={`w-5 h-5 ml-2 text-gray-600 transition-transform duration-200 ${
+                isMonthListOpen ? "rotate-180" : ""
+              }`}
+            /> */}
+          </button>
+
+          {isMonthListOpen && (
+            <div
+              id="month-list-dropdown"
+              className="absolute right-0 mt-1 w-24 bg-white rounded-md shadow-xl z-20 border border-gray-200 py-1"
+              role="listbox"
+            >
+              <ul className="overflow-y-auto">
+                {/* <li
+                  className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer ${
+                    !selectedMonth
+                      ? "bg-blue-50 font-semibold text-blue-700"
+                      : ""
+                  }`}
+                  onClick={() => selectMonth(null)} // null for "Overview" or no specific month
+                  role="option"
+                  aria-selected={!selectedMonth}
+                >
+                  Overview (All Months)
+                </li> */}
+                {availableMonths.map((month) => (
+                  <li
+                    key={month}
+                    className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer ${
+                      selectedMonth === month
+                        ? "bg-blue-50 font-semibold text-blue-700"
+                        : ""
+                    }`}
+                    onClick={() => selectMonth(month)}
+                    role="option"
+                    aria-selected={selectedMonth === month}
+                  >
+                    {month}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
-      <BarChart />
+      <BarChart data={currentYearData.data} selectedMonth={selectedMonth} />
     </div>
   );
 };
+
+// ... (StatisticsPage component remains the same, but will now use the updated components)
+// Remember to import ChevronDownIcon if it's not already.
+// import { ChevronDownIcon, CheckIcon } from "@heroicons/react/24/solid"; // Ensure CheckIcon is also there
+
 export default function StatisticsPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <Sidebar />
       <main className="flex-1 ml-20 p-6 sm:p-8">
-        {" "}
-        {/* Add ml-20 for sidebar width */}
         <Header />
         <div className="mt-6 bg-white p-6 sm:p-8 rounded-xl shadow-lg">
           <div className="border-b border-gray-200 pb-4 mb-8">
-            {/*
-              - border-b border-gray-200: Adds a bottom border to this div, which will be the line.
-              - pb-4: Adds padding below the text, creating space between the text and the line.
-              - mb-8: Adds margin below this whole title section (including the line), creating space
-                      before the chart content starts.
-            */}
             <h1 className="text-2xl font-bold text-gray-800">
-              {/* The h1 itself no longer needs a bottom margin here */}
               History & Statistics
             </h1>
           </div>
